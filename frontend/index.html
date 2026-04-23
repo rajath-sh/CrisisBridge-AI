@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrisisBridge AI — Smart Emergency Coordination</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div id="app" class="app-container">
+        <!-- Navigation -->
+        <nav class="navbar" id="main-nav" style="display: none;">
+            <div class="logo">
+                <i data-lucide="shield-alert"></i>
+                <span>CrisisBridge AI</span>
+            </div>
+            <div class="nav-links">
+                <button class="btn btn-ghost" onclick="showView('dashboard')">Dashboard</button>
+                <button class="btn btn-ghost" onclick="showView('chat')">AI Assistant</button>
+                <button class="btn btn-ghost" onclick="showView('safety')">Safety Check</button>
+            </div>
+            <div class="user-profile">
+                <span id="user-display-name">Guest</span>
+                <button class="btn btn-ghost" onclick="logout()">Logout</button>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            
+            <!-- ── Login View ──────────────────────── -->
+            <section id="view-login" class="view">
+                <div style="max-width: 400px; margin: 100px auto;">
+                    <div class="card">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <i data-lucide="shield-alert" style="width: 48px; height: 48px; color: var(--primary); margin-bottom: 1rem;"></i>
+                            <h2>Welcome Back</h2>
+                            <p class="text-muted">CrisisBridge AI Coordination Platform</p>
+                        </div>
+                        <form id="login-form">
+                            <div class="input-group">
+                                <label>Email Address</label>
+                                <input type="email" id="login-email" required placeholder="admin@hotel.com">
+                            </div>
+                            <div class="input-group">
+                                <label>Password</label>
+                                <input type="password" id="login-password" required placeholder="••••••••">
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+                        </form>
+                        <p style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-muted);">
+                            Don't have an account? <a href="#" onclick="alert('Registration would go here')">Register</a>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Dashboard View ───────────────────── -->
+            <section id="view-dashboard" class="view" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1>Live Incident Dashboard</h1>
+                    <button class="btn btn-danger pulse-red" onclick="reportPanic()">
+                        <i data-lucide="alert-octagon"></i> PANIC BUTTON
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 300px; gap: 2rem;">
+                    <!-- Active Incidents List -->
+                    <div>
+                        <h3 style="margin-bottom: 1rem;">Active Incidents</h3>
+                        <div id="incidents-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Mock Data Placeholder -->
+                            <div class="card">
+                                <p class="text-muted">Loading incidents...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Sidebar -->
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div class="card">
+                            <h3>Quick Stats</h3>
+                            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Active</span>
+                                    <span class="text-main" id="stat-active">0</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Resolved Today</span>
+                                    <span class="text-main" id="stat-resolved">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3>Staff Online</h3>
+                            <ul style="list-style: none; margin-top: 1rem; font-size: 0.875rem;">
+                                <li style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success);"></span>
+                                    John (Security)
+                                </li>
+                                <li style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success);"></span>
+                                    Sarah (Medical)
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── AI Assistant View ────────────────── -->
+            <section id="view-chat" class="view" style="display: none;">
+                <div style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; height: calc(100vh - 160px);">
+                    <h1>AI Crisis Assistant</h1>
+                    <p class="text-muted" style="margin-bottom: 2rem;">Expert emergency guidance powered by RAG</p>
+                    
+                    <div id="chat-messages" class="card" style="flex: 1; overflow-y: auto; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; align-self: flex-start; max-width: 80%;">
+                            Hello! I am your CrisisBridge Assistant. How can I help you today?
+                        </div>
+                    </div>
+
+                    <form id="chat-form" style="display: flex; gap: 1rem;">
+                        <input type="text" id="chat-input" placeholder="Ask a question (e.g., 'What to do in a fire?')" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ── Safety Check View ────────────────── -->
+            <section id="view-safety" class="view" style="display: none;">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h1>Safety Status Check</h1>
+                    <p class="text-muted" style="margin-bottom: 2rem;">Verify if your current location is affected by any active incidents.</p>
+
+                    <div class="card" style="margin-bottom: 2rem;">
+                        <form id="safety-form">
+                            <div class="input-group">
+                                <label>Your Floor</label>
+                                <input type="number" id="safety-floor" value="3">
+                            </div>
+                            <div class="input-group">
+                                <label>Zone (Optional)</label>
+                                <select id="safety-zone">
+                                    <option value="lobby">Lobby</option>
+                                    <option value="east_wing" selected>East Wing</option>
+                                    <option value="west_wing">West Wing</option>
+                                    <option value="restaurant">Restaurant</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i data-lucide="search"></i> Check Safety Now
+                            </button>
+                        </form>
+                    </div>
+
+                    <div id="safety-result" style="display: none;">
+                        <!-- Result card will be injected here -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Feedback Toast/Modal (Optional) -->
+        <div id="feedback-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+            <div class="card" style="width: 400px;">
+                <h3>Help us improve</h3>
+                <p class="text-muted">Was this AI response helpful?</p>
+                <div style="display: flex; gap: 1rem; margin: 1.5rem 0;">
+                    <button class="btn btn-ghost" style="flex: 1;" onclick="submitFeedback('helpful')">
+                        <i data-lucide="thumbs-up"></i> Helpful
+                    </button>
+                    <button class="btn btn-ghost" style="flex: 1;" onclick="submitFeedback('not_helpful')">
+                        <i data-lucide="thumbs-down"></i> Not Helpful
+                    </button>
+                </div>
+                <textarea id="feedback-comment" placeholder="Any additional comments?" rows="3"></textarea>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" onclick="closeFeedback()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
