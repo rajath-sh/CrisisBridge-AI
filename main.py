@@ -94,15 +94,24 @@ app.add_middleware(
 # app.include_router(ai_router, prefix=f"{settings.API_PREFIX}/ai", tags=["AI Assistant"])
 
 # ── Person 3: Auth, Feedback, Notifications ─────
-# Uncomment when Person 3's routes are ready:
-# from backend.api.auth import router as auth_router
-# app.include_router(auth_router, prefix=f"{settings.API_PREFIX}/auth", tags=["Auth"])
+# Each person's routers are registered as they are implemented.
+from backend.api.auth import router as auth_router
+app.include_router(auth_router, prefix=f"{settings.API_PREFIX}/auth", tags=["Auth"])
+
+# Placeholder for future Person 3 routes:
 # from backend.api.feedback import router as feedback_router
 # app.include_router(feedback_router, prefix=f"{settings.API_PREFIX}/feedback", tags=["Feedback"])
-# from backend.api.notifications import router as notifications_router
-# app.include_router(notifications_router, prefix=f"{settings.API_PREFIX}/notifications", tags=["Notifications"])
-# from backend.api.query import router as query_router
-# app.include_router(query_router, prefix=f"{settings.API_PREFIX}/query", tags=["Query"])
+from backend.api.feedback import router as feedback_router
+app.include_router(feedback_router, prefix=f"{settings.API_PREFIX}/feedback", tags=["Feedback"])
+
+from backend.api.notifications import router as notifications_router
+app.include_router(notifications_router, prefix=f"{settings.API_PREFIX}/notifications", tags=["Notifications"])
+
+from backend.api.query import router as query_router
+app.include_router(query_router, prefix=f"{settings.API_PREFIX}/query", tags=["Query"])
+
+from backend.api.users import router as users_router
+app.include_router(users_router, prefix=f"{settings.API_PREFIX}/users", tags=["Users"])
 
 
 # ═══════════════════════════════════════════════════════════
