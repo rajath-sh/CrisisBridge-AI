@@ -1,52 +1,46 @@
-# ═══════════════════════════════════════════════════════════
-# CrisisBridge AI — Requirements
-# ═══════════════════════════════════════════════════════════
+# CrisisBridge AI - Requirements
 # Install: pip install -r requirements.txt
-# ═══════════════════════════════════════════════════════════
 
-# ── Web Framework ────────────────────────────────
+# Web Framework
 fastapi==0.115.0
 uvicorn[standard]==0.30.0
 python-multipart==0.0.9
 
-# ── Database ─────────────────────────────────────
+# Database
 sqlalchemy==2.0.35
 psycopg2-binary==2.9.9
 alembic==1.13.2
 
-# ── Redis ────────────────────────────────────────
+# Redis
 redis==5.1.0
 
-# ── Auth (JWT) ───────────────────────────────────
+# Auth (JWT)
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 
-# ── Schema Validation ───────────────────────────
+# Schema Validation
 pydantic==2.9.2
 pydantic-settings==2.5.2
 email-validator==2.2.0
 
-# ── AI / RAG (Person 2) ─────────────────────────
+# AI / RAG (Person 2)
 sentence-transformers==3.1.1
 faiss-cpu==1.8.0
 langchain==0.3.1
 langchain-community==0.3.1
 langchain-text-splitters==0.3.0
-# openai==1.47.0  # Uncomment if using OpenAI API
+# openai==1.47.0
 
-# ── PDF Processing (Person 2) ───────────────────
+# PDF Processing (Person 2)
 pypdf2==3.0.1
 python-docx==1.1.2
 
-# ── HTTP & Async ─────────────────────────────────
+# HTTP & Async
 httpx==0.27.2
 aiofiles==24.1.0
 
-# ── Logging ──────────────────────────────────────
+# Logging
 loguru==0.7.2
 
-# ── CORS ─────────────────────────────────────────
-# (included in fastapi)
-
-# ── Utilities ────────────────────────────────────
+# Utilities
 python-dotenv==1.0.1
