@@ -32,3 +32,14 @@ build/
 # ── Node (frontend) ─────────────
 node_modules/
 .next/
+
+# ── Databases ────────────────────
+*.db
+*.sqlite3
+test_*.db
+
+# ── Testing ─────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/

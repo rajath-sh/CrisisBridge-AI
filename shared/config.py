@@ -31,8 +31,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
-    # ── Database (PostgreSQL) ────────────────────
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/crisisbridge"
+    # ── Database (SQLite default for local dev) ──────
+    DATABASE_URL: str = "sqlite:///./crisisbridge.db"
     DB_ECHO: bool = False  # Set True to print SQL queries (debug)
 
     # ── Redis ────────────────────────────────────

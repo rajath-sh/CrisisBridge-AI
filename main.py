@@ -14,6 +14,7 @@ All routes are prefixed with /api/v1/
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 import sys
@@ -37,20 +38,20 @@ logger.add(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application startup and shutdown events."""
-    logger.info("🚀 Starting CrisisBridge AI...")
+    logger.info("Starting CrisisBridge AI...")
     
     # Initialize database tables
     try:
         init_db()
-        logger.info("✅ Database initialized")
+        logger.info("Database initialized")
     except Exception as e:
-        logger.error(f"❌ Database init failed: {e}")
+        logger.error(f"Database init failed: {e}")
     
-    logger.info("✅ CrisisBridge AI is ready!")
+    logger.info("CrisisBridge AI is ready!")
     yield
     
     # Shutdown
-    logger.info("🛑 Shutting down CrisisBridge AI...")
+    logger.info("Shutting down CrisisBridge AI...")
 
 
 # ── Create FastAPI app ───────────────────────────
@@ -120,11 +121,15 @@ async def health_check():
     }
 
 
-@app.get("/", tags=["Root"])
-async def root():
-    """Root endpoint — redirects to docs."""
-    return {
-        "message": f"Welcome to {settings.APP_NAME}",
-        "docs": "/docs",
-        "health": f"{settings.API_PREFIX}/health",
-    }
+
+# ═══════════════════════════════════════════════════════════
+# FRONTEND SERVING
+# ═══════════════════════════════════════════════════════════
+
+# Mount the frontend directory to serve index.html and assets
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
