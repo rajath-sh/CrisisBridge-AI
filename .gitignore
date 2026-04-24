@@ -16,6 +16,8 @@ __pycache__/
 *.swo
 
 # ── Data & Indices ───────────────
+# Allow the entire AI data folder (including FAISS index) for teammates
+!ai_core/data/
 data/
 logs/
 *.log
