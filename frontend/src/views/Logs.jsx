@@ -330,7 +330,6 @@ const Logs = () => {
         </div>
       )}
     </motion.div>
-    </motion.div>
   );
 };
 

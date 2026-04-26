@@ -44,6 +44,14 @@ async def lifespan(app: FastAPI):
     try:
         init_db()
         logger.info("Database initialized")
+        
+        # Initialize isolated hotel module database
+        from hotel_map_broadcast_module.db.repository import init_db as hotel_init_db
+        from incidents.database_extra import init_extra_db
+        
+        hotel_init_db()
+        init_extra_db()
+        logger.info("Hotel Module and Extra databases initialized")
     except Exception as e:
         logger.error(f"Database init failed: {e}")
     
@@ -105,6 +113,10 @@ app.include_router(safety_router, prefix=f"{settings.API_PREFIX}/safety", tags=[
 
 from backend.api.logs import router as logs_router
 app.include_router(logs_router, prefix=f"{settings.API_PREFIX}/logs", tags=["Logs"])
+
+# ── Person 4: Hotel Map & Broadcast Module (ISOLATED) ─────
+from hotel_map_broadcast_module.api.routes import router as hotel_router
+app.include_router(hotel_router, prefix=f"{settings.API_PREFIX}/hotel", tags=["Hotel Module"])
 
 
 # ═══════════════════════════════════════════════════════════

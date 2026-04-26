@@ -78,12 +78,19 @@ def close_session(session_id: str, db: Session = Depends(get_db)):
     "/session/{session_id}",
     summary="🗑️ Permanently delete a session + all its messages (admin)"
 )
-def delete_session(session_id: str, db: Session = Depends(get_db)):
+async def delete_session(session_id: str, db: Session = Depends(get_db)):
     """
     (Admin) Permanently deletes a session and ALL its messages from the database.
     This cannot be undone. Use close instead if you just want to end the session.
     """
     from chat_module.models.chat_models import ChatSession, ChatMessage
+
+    # Disconnect any live participants gracefully
+    if session_id in manager.active_connections:
+        await manager.broadcast(session_id, {
+            "event": "error",
+            "message": "This session has been permanently deleted by an administrator."
+        })
 
     # Delete messages first (foreign key order)
     db.query(ChatMessage).filter(ChatMessage.session_id == session_id).delete()
@@ -103,21 +110,30 @@ def delete_session(session_id: str, db: Session = Depends(get_db)):
 
 
 @rest_router.get("/active", summary="View live active WebSocket connections (admin)")
-def active_connections():
+def active_connections(db: Session = Depends(get_db)):
     """
-    (Admin) Shows which sessions currently have live WebSocket connections
-    and how many participants are connected to each.
+    (Admin) Shows which sessions currently have live WebSocket connections,
+    including the originating user ID.
     """
     active_sessions = manager.get_all_active_sessions()
-    return {
-        "total_active_sessions": len(active_sessions),
-        "sessions": [
-            {
+    
+    valid_sessions = []
+    for sid in active_sessions:
+        session = repository.get_session(db, sid)
+        if session:
+            from chat_module.models.chat_models import ChatMessage
+            msg_count = db.query(ChatMessage).filter(ChatMessage.session_id == sid).count()
+            
+            valid_sessions.append({
                 "session_id": sid,
-                "active_users": manager.get_active_count(sid)
-            }
-            for sid in active_sessions
-        ]
+                "user_id": session.user_id,
+                "active_users": manager.get_active_count(sid),
+                "message_count": msg_count
+            })
+
+    return {
+        "total_active_sessions": len(valid_sessions),
+        "sessions": valid_sessions
     }
 
 

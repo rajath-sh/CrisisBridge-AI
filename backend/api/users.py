@@ -73,6 +73,29 @@ async def update_user_role(
 
 
 @router.get(
+    "/staff/online",
+    response_model=List[UserResponse],
+    summary="Get online staff and admins"
+)
+async def list_online_staff(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Returns a list of staff and admins active in the last 5 minutes.
+    """
+    from datetime import datetime, timedelta
+    five_mins_ago = datetime.utcnow() - timedelta(minutes=5)
+    
+    online_staff = db.query(User).filter(
+        User.role == UserRole.STAFF,
+        User.updated_at >= five_mins_ago,
+        User.is_active == True
+    ).all()
+    
+    return [UserResponse.from_orm(u) for u in online_staff]
+
+@router.get(
     "",
     response_model=List[UserResponse],
     summary="List all users (Admin Only)"

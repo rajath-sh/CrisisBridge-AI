@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from shared.dependencies import get_db, get_current_active_user
-from shared.schemas import UserRegister, UserLogin, TokenResponse, UserResponse
+from shared.schemas import UserRegister, UserLogin, TokenResponse, UserResponse, UserDetailsUpdate, UserPasswordUpdate
 from shared.models import User
 from backend.services import auth as auth_service
 
@@ -58,9 +58,66 @@ async def login(
     summary="Get current user profile"
 )
 async def get_me(
+    db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
     """
     Returns the profile of the currently authenticated user.
+    Also touches the updated_at timestamp to track online presence.
     """
+    from datetime import datetime
+    current_user.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(current_user)
     return UserResponse.from_orm(current_user)
+
+
+@router.patch(
+    "/me/details",
+    response_model=UserResponse,
+    summary="Update current user details"
+)
+async def update_details(
+    data: UserDetailsUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Updates full name or email for the current user.
+    """
+    if data.full_name is not None:
+        current_user.full_name = data.full_name
+    if data.email is not None:
+        # Check if email is already taken
+        existing = db.query(User).filter(User.email == data.email, User.id != current_user.id).first()
+        if existing:
+            from fastapi import HTTPException
+            raise HTTPException(status_code=400, detail="Email already in use")
+        current_user.email = data.email
+        
+    db.commit()
+    db.refresh(current_user)
+    return UserResponse.from_orm(current_user)
+
+
+@router.patch(
+    "/me/password",
+    summary="Update current user password"
+)
+async def update_password(
+    data: UserPasswordUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """
+    Changes the password for the current user.
+    """
+    from backend.services.auth import verify_password, hash_password
+    from fastapi import HTTPException
+    
+    if not verify_password(data.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect current password")
+        
+    current_user.hashed_password = hash_password(data.new_password)
+    db.commit()
+    return {"message": "Password updated successfully"}

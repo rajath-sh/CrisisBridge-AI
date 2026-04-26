@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import BroadcastListener from './components/BroadcastListener';
 import Login from './views/Login';
 import Register from './views/Register';
 import Dashboard from './views/Dashboard';
@@ -11,6 +12,7 @@ import Logs from './views/Logs';
 import Users from './views/Users';
 import LiveChat from './views/LiveChat';
 import Sensors from './views/Sensors';
+import HotelMaps from './views/HotelMaps';
 
 const ProtectedRoute = ({ children }) => {
   const { token, loading } = useAuth();
@@ -25,6 +27,7 @@ const AppContent = () => {
   return (
     <div className="app-container">
       {token && <Navbar />}
+      {token && <BroadcastListener />}
       <main className="main-content">
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -36,6 +39,10 @@ const AppContent = () => {
           <Route 
             path="/chat" 
             element={<ProtectedRoute><Chat /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/maps" 
+            element={<ProtectedRoute><HotelMaps /></ProtectedRoute>} 
           />
           <Route 
             path="/safety" 

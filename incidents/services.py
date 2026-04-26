@@ -6,15 +6,20 @@ def fetch_incidents(db: Session):
     return db.query(Incident).all()
 
 def create_incident(db: Session, incident_data):
-    # Map string type to Enum
+    # Try to map string to Enum, fallback to OTHER
     try:
         itype = IncidentType(incident_data.incident_type.lower())
-    except ValueError:
+    except:
         itype = IncidentType.OTHER
 
     new_incident = Incident(
-        title=incident_data.title,
+        title=incident_data.title, # will be set to type in frontend
+        description=incident_data.description,
         incident_type=itype,
+        severity=incident_data.severity,
+        floor=incident_data.floor,
+        room=incident_data.room,
+        zone=incident_data.zone,
         latitude=incident_data.latitude,
         longitude=incident_data.longitude,
         status=IncidentStatus.REPORTED,

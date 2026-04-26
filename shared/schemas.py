@@ -79,6 +79,18 @@ class UserLocationUpdate(BaseModel):
     current_zone: Optional[str] = None
 
 
+class UserDetailsUpdate(BaseModel):
+    """PATCH /api/v1/auth/me/details"""
+    full_name: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+
+class UserPasswordUpdate(BaseModel):
+    """PATCH /api/v1/auth/me/password"""
+    current_password: str
+    new_password: str = Field(..., min_length=6)
+
+
 # ═══════════════════════════════════════════════════════════
 #  INCIDENT SCHEMAS
 #  API Owner: Person 1

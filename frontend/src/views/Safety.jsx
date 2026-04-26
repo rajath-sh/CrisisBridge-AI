@@ -4,16 +4,35 @@ import { ShieldCheck, Search, AlertTriangle, ShieldAlert, Loader2 } from 'lucide
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Safety = () => {
-  const [floor, setFloor] = useState(3);
-  const [zone, setZone] = useState('east_wing');
+  const [selectedLocation, setSelectedLocation] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [locations, setLocations] = useState([]);
+
+  React.useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const locRes = await axios.get('/api/v1/hotel/locations?t=' + Date.now());
+        setLocations(locRes.data || []);
+      } catch (err) {
+        console.error('Failed to fetch locations', err);
+      }
+    };
+    fetchLocations();
+  }, []);
 
   const handleCheck = async (e) => {
     e.preventDefault();
+    if (!selectedLocation) {
+      alert("Please select your current location.");
+      return;
+    }
     setLoading(true);
     try {
-      const response = await axios.post('/api/v1/safety/check', { floor, zone });
+      const response = await axios.post('/api/v1/safety/check', { 
+        floor: selectedLocation.floor, 
+        zone: selectedLocation.name 
+      });
       setResult(response.data);
     } catch (err) {
       alert("Safety check failed. Please try again.");
@@ -63,33 +82,30 @@ const Safety = () => {
 
       <div className="glass-card">
         <form onSubmit={handleCheck}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+          <div style={{ marginBottom: '1.5rem' }}>
             <div className="input-group">
-              <label>Your Floor</label>
-              <input 
-                type="number" 
-                className="input-field" 
-                value={floor}
-                onChange={(e) => setFloor(parseInt(e.target.value))}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label>Zone / Wing</label>
+              <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--primary)', marginBottom: '0.5rem', display: 'block' }}>YOUR CURRENT LOCATION</label>
               <select 
                 className="input-field"
-                value={zone}
-                onChange={(e) => setZone(e.target.value)}
+                style={{ width: '100%', padding: '1rem' }}
+                onChange={(e) => {
+                  const loc = locations.find(l => l.id === e.target.value);
+                  setSelectedLocation(loc);
+                }}
               >
-                <option value="lobby">Lobby</option>
-                <option value="east_wing">East Wing</option>
-                <option value="west_wing">West Wing</option>
-                <option value="restaurant">Restaurant</option>
+                <option value="">Choose where you are...</option>
+                {locations.length > 0 ? (
+                  locations.map(loc => (
+                    <option key={loc.id} value={loc.id}>{loc.name} (Floor {loc.floor})</option>
+                  ))
+                ) : (
+                  <option disabled>Loading locations...</option>
+                )}
               </select>
             </div>
           </div>
-          <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-            {loading ? <Loader2 className="animate-spin" size={20} /> : <><Search size={20} /> Check Safety Status</>}
+          <button type="submit" className="btn btn-primary w-full" disabled={loading} style={{ padding: '1rem', fontWeight: 'bold' }}>
+            {loading ? <Loader2 className="animate-spin" size={20} /> : <><ShieldCheck size={20} /> RUN SAFETY CHECK</>}
           </button>
         </form>
       </div>

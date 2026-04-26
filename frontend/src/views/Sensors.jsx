@@ -159,15 +159,14 @@ const Sensors = () => {
                       onChange={e => setNewSensor({...newSensor, sensor_id: e.target.value})}
                       required
                     />
-                    <select 
+                    <input 
+                      type="text" 
+                      placeholder="Type (e.g. smoke)" 
                       className="input-field py-1 px-2 text-sm w-32"
                       value={newSensor.type}
                       onChange={e => setNewSensor({...newSensor, type: e.target.value})}
-                    >
-                      <option value="smoke">Smoke</option>
-                      <option value="temperature">Temperature</option>
-                      <option value="water">Water</option>
-                    </select>
+                      required
+                    />
                     <input 
                       type="text" 
                       placeholder="Zone" 
