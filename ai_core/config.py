@@ -24,8 +24,28 @@ class AIConfig:
     @property
     def MOCK_MODE(self) -> bool:
         """If True, skips API calls and returns hardcoded responses for UI testing."""
-        # ⚠️ MOCK MODE ON — flip back to False once Gemini quota resets!
-        return True
+        # Read from .env, default to True for safety
+        import os
+        val = os.getenv("AI_MOCK_MODE", "True").lower()
+        return val in ("true", "1", "yes")
+
+    # ── Vertex AI (GCP Enterprise) ────────────────
+    @property
+    def USE_VERTEX_AI(self) -> bool:
+        """Whether to use Vertex AI (GCP) instead of Google AI Studio (API Key)."""
+        import os
+        val = os.getenv("AI_USE_VERTEX", "False").lower()
+        return val in ("true", "1", "yes")
+
+    @property
+    def GCP_PROJECT_ID(self) -> str:
+        import os
+        return os.getenv("GCP_PROJECT_ID", "")
+
+    @property
+    def GCP_LOCATION(self) -> str:
+        import os
+        return os.getenv("GCP_LOCATION", "us-central1")
 
     # ── Gemini LLM ───────────────────────────────
     @property

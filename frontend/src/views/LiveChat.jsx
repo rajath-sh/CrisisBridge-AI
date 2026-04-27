@@ -4,8 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { Send, HeadphonesIcon, User as UserIcon, Loader2, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const CHAT_API_BASE = 'http://localhost:8002';
-const WS_BASE = 'ws://localhost:8002/ws/chat';
+const CHAT_API_BASE = import.meta.env.VITE_CHAT_API_URL || 'http://localhost:8002';
+const WS_BASE = import.meta.env.VITE_CHAT_WS_URL || 'ws://localhost:8002/ws/chat';
 
 const LiveChat = () => {
   const { user } = useAuth();

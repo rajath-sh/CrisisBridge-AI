@@ -23,7 +23,18 @@ class BaseAgent:
     def client(self) -> genai.Client:
         """Lazy load the Gemini client so it doesn't fail on startup if API key is missing."""
         if self._client is None and not ai_config.MOCK_MODE:
-            self._client = genai.Client(api_key=ai_config.GEMINI_API_KEY)
+            if ai_config.USE_VERTEX_AI:
+                # GCP Vertex AI Mode
+                self._client = genai.Client(
+                    vertexai=True,
+                    project=ai_config.GCP_PROJECT_ID,
+                    location=ai_config.GCP_LOCATION
+                )
+                logger.info(f"[{self.__class__.__name__}] Initialized Gemini Client (Vertex AI Mode)")
+            else:
+                # Google AI Studio Mode (API Key)
+                self._client = genai.Client(api_key=ai_config.GEMINI_API_KEY)
+                logger.info(f"[{self.__class__.__name__}] Initialized Gemini Client (API Key Mode)")
         return self._client
 
     async def execute(self, **kwargs) -> Any:

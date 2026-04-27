@@ -20,10 +20,11 @@ How to trigger a controlled spike during the demo:
 import time
 import random
 import requests
+import os
 from datetime import datetime
 
 # ── Configuration ────────────────────────────────────
-SENSOR_API_URL   = "http://localhost:8001"
+SENSOR_API_URL   = os.getenv("SENSOR_API_URL", "http://localhost:8001")
 INTERVAL_SECONDS = 3   # One reading every 3 seconds
 
 

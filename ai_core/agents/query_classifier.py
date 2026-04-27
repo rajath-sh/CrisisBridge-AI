@@ -37,5 +37,5 @@ Return ONLY valid JSON in this format:
             # Fallback
             return {"category": "GENERAL", "rewritten_query": raw_query}
 
-    def _get_mock_response(self) -> dict:
-        return {"category": "EMERGENCY", "rewritten_query": "What is the emergency procedure for a fire?"}
+    def _get_mock_response(self) -> str:
+        return '{"category": "EMERGENCY", "rewritten_query": "What is the emergency procedure for a fire?"}'

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Activity, ShieldAlert, ShieldCheck, Loader2, Thermometer, Flame, Droplets, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const SENSOR_API_BASE = 'http://localhost:8001/sensor';
+const SENSOR_API_BASE = (import.meta.env.VITE_SENSOR_API_URL || 'http://localhost:8001') + '/sensor';
 
 const Sensors = () => {
   const { user } = useAuth();

@@ -37,7 +37,8 @@ const Navbar = () => {
   const fetchSupportRequests = async () => {
     if (user?.role === 'admin' || user?.role === 'staff') {
       try {
-        const res = await axios.get('http://localhost:8002/chat/active');
+        const CHAT_URL = import.meta.env.VITE_CHAT_API_URL || 'http://localhost:8002';
+        const res = await axios.get(`${CHAT_URL}/chat/active`);
         const sessions = res.data.sessions || [];
         
         let newChatDetected = false;
@@ -80,7 +81,8 @@ const Navbar = () => {
   const fetchSensorAlerts = async () => {
     if (user?.role === 'admin' || user?.role === 'staff') {
       try {
-        const res = await axios.get('http://localhost:8001/sensor/alerts');
+        const SENSOR_URL = import.meta.env.VITE_SENSOR_API_URL || 'http://localhost:8001';
+        const res = await axios.get(`${SENSOR_URL}/sensor/alerts`);
         const alerts = res.data || [];
         
         const currentAlertKeys = new Set(alerts.map(a => `${a.sensor_id}-${a.timestamp}`));

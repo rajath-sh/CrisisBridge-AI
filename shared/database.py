@@ -28,12 +28,15 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from shared.config import settings
 
 # ── Engine ───────────────────────────────────────
+connect_args = {"check_same_thread": False} if "sqlite" in settings.DATABASE_URL.lower() else {}
+
 engine = create_engine(
     settings.DATABASE_URL,
     echo=settings.DB_ECHO,
     pool_size=10,
     max_overflow=20,
     pool_pre_ping=True,  # Verify connections before use
+    connect_args=connect_args
 )
 
 # ── Session Factory ──────────────────────────────
