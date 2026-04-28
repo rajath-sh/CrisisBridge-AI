@@ -96,8 +96,10 @@ class BaseAgent:
                     logger.error(f"Error in {self.__class__.__name__}: {error_str}")
                     raise e
 
-        logger.error(f"[{self.__class__.__name__}] All models in fallback chain exhausted.")
-        raise last_error
+        except Exception as e:
+            logger.error(f"[{self.__class__.__name__}] Real AI failed: {str(e)}")
+            logger.warning(f"[{self.__class__.__name__}] Triggering Safety Fallback to Mock Response.")
+            return self._get_mock_response()
 
     def _get_mock_response(self) -> str:
         """Override this in subclasses to provide specific mock data."""
