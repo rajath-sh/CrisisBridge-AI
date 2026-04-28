@@ -18,7 +18,14 @@ class EmbeddingModel:
     def client(self) -> genai.Client:
         """Lazy load the Gemini client."""
         if self._client is None and not ai_config.MOCK_MODE:
-            self._client = genai.Client(api_key=ai_config.GEMINI_API_KEY)
+            if ai_config.USE_VERTEX_AI:
+                self._client = genai.Client(
+                    vertexai=True,
+                    project=ai_config.GCP_PROJECT_ID,
+                    location=ai_config.GCP_LOCATION
+                )
+            else:
+                self._client = genai.Client(api_key=ai_config.GEMINI_API_KEY)
         return self._client
 
     def embed_texts(self, texts: List[str]) -> np.ndarray:
