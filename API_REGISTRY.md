@@ -39,6 +39,40 @@
 | 15 | `GET` | `/api/v1/notifications` | Person 3 | ALL | 🔒 | Get user's notifications |
 | 16 | `PATCH` | `/api/v1/notifications/{id}/read` | Person 3 | ALL | 🔒 | Mark notification as read |
 | 17 | `POST` | `/api/v1/notifications/broadcast` | Person 3 | Admin | 👑 | Broadcast message to all |
+| 18 | `GET` | `/api/v1/users` | Person 3 | Admin | 👑 | List all registered users |
+| 19 | `PATCH` | `/api/v1/users/{id}/role` | Person 3 | Admin | 👑 | Promote/Demote user role |
+| 20 | `GET` | `/api/v1/users/staff/online` | Person 3 | ALL | 🔒 | Get real-time online staff |
+| 21 | `GET` | `/api/v1/logs/queries` | Person 3 | Admin | 👑 | Get AI assistant query logs |
+| 22 | `DELETE` | `/api/v1/logs/queries` | Person 3 | Admin | 👑 | Clear AI logs |
+| 23 | `GET` | `/api/v1/logs/incidents` | Person 3 | Admin | 👑 | Get incident history logs |
+| 24 | `DELETE` | `/api/v1/logs/incidents` | Person 3 | Admin | 👑 | Clear incident history |
+| 25 | `POST` | `/api/v1/hotel/maps/upload` | Person 4 | Admin | 👑 | Upload floor map (multipart/form) |
+| 26 | `GET` | `/api/v1/hotel/maps` | Person 4 | ALL | 🔒 | List all floor maps |
+| 27 | `GET` | `/api/v1/hotel/maps/image/{id}` | Person 4 | ALL | 🔓 | Download/View map image |
+| 28 | `DELETE` | `/api/v1/hotel/maps/{id}` | Person 4 | Admin | 👑 | Delete map record |
+| 29 | `PUT` | `/api/v1/hotel/maps/{id}` | Person 4 | Admin | 👑 | Update map description |
+| 30 | `POST` | `/api/v1/hotel/locations` | Person 4 | Admin | 👑 | Create reference location |
+| 31 | `GET` | `/api/v1/hotel/locations` | Person 4 | ALL | 🔓 | List reference locations (Dropdowns) |
+| 32 | `PUT` | `/api/v1/hotel/locations/{id}` | Person 4 | Admin | 👑 | Update location name/floor |
+| 33 | `DELETE` | `/api/v1/hotel/locations/{id}` | Person 4 | Admin | 👑 | Delete reference location |
+| 34 | `POST` | `/api/v1/hotel/broadcast` | Person 4 | Admin | 👑 | Create persistent global broadcast |
+| 35 | `GET` | `/api/v1/hotel/broadcast` | Person 4 | ALL | 🔒 | List active broadcasts |
+| 36 | `DELETE` | `/api/v1/hotel/broadcast/{id}` | Person 4 | Admin | 👑 | Delete broadcast |
+| 37 | `WS` | `/api/v1/hotel/ws/broadcast` | Person 4 | ALL | 🔓 | Real-time alert WebSocket |
+| 38 | `GET` | `:8001/sensor/list` | Person 3 | Staff/Admin | 👷👑 | List all registered sensors |
+| 39 | `GET` | `:8001/sensor/alerts` | Person 3 | Staff/Admin | 👷👑 | Get recent threshold breaches |
+| 40 | `POST` | `:8001/sensor/queue-spike` | Person 3 | Admin | 👑 | Trigger manual sensor spike (Demo) |
+| 41 | `POST` | `:8001/sensor/register` | Person 3 | Admin | 👑 | Register new IoT sensor |
+| 42 | `DELETE` | `:8001/sensor/{id}` | Person 3 | Admin | 👑 | Unregister a sensor |
+| 43 | `GET` | `:8001/sensor/latest-readings` | Person 3 | Staff/Admin | 👷👑 | Live sensor data stream |
+| 44 | `POST` | `:8002/chat/start` | Person 3 | Guest | 👤 | Start new support session |
+| 45 | `GET` | `:8002/chat/active` | Person 3 | Staff/Admin | 👷👑 | View live WebSocket sessions |
+| 46 | `GET` | `:8002/chat/messages/{sid}` | Person 3 | ALL | 🔒 | Fetch session chat history |
+| 47 | `PATCH` | `:8002/chat/session/{sid}/close` | Person 3 | Staff/Admin | 👷👑 | End live chat session |
+| 48 | `DELETE` | `:8002/chat/session/{sid}` | Person 3 | Admin | 👑 | Purge session data |
+| 49 | `WS` | `:8002/ws/chat/{sid}` | Person 3 | ALL | 🔒 | Low-latency chat socket |
+| 50 | `POST` | `/api/v1/incidents/upload-image`| Person 1 | ALL | 🔒 | Upload incident photo |
+| 51 | `POST` | `/api/v1/incidents/update-status`| Person 1 | Staff/Admin | 👷👑 | Atomic status update |
 
 ---
 
@@ -422,3 +456,93 @@ Response: MessageResponse
 5. **Person 2 → Person 3 interface**: Person 3 calls `ai_core.main.process_query(request)` — NO direct imports of agents/rag
 6. **Test with mock first**: Person 2's `main.py` ships with a mock. Person 3 integrates immediately.
 7. **No cross-folder imports**: Person 1 never imports from Person 3's backend/. Use shared/ only.
+
+---
+
+### 18. `GET /api/v1/users` 👑
+**Owner:** Person 3 | **Used by:** Admin User Management
+
+```
+Response: List[UserResponse]
+```
+
+---
+
+### 19. `PATCH /api/v1/users/{id}/role` 👑
+**Owner:** Person 3 | **Used by:** Admin only
+
+```
+Request: { "role": "staff" }
+Response: UserResponse
+```
+
+---
+
+### 20. `GET /api/v1/users/staff/online` 🔒
+**Owner:** Person 3 | **Used by:** ALL (Presence Check)
+
+```
+Response: List[UserResponse]
+(Users active in the last 5 minutes)
+```
+
+---
+
+### 21. `GET /api/v1/logs/queries` 👑
+**Owner:** Person 3 | **Used by:** Admin Audit
+
+```
+Response: List[DetailedQueryLog]
+(Includes cache status and response times)
+```
+
+---
+
+### 22. `POST /api/v1/hotel/maps/upload` 👑
+**Owner:** Person 4 | **Used by:** Admin (Multipart Form)
+
+```
+Form Fields: file, description, floor_number
+Response: MapResponse
+```
+
+---
+
+### 23. `WS ws://localhost:8000/api/v1/hotel/ws/broadcast` 🔓
+**Owner:** Person 4 | **Used by:** ALL (Real-time Toasts)
+
+```
+Logic:
+1. Connects on app load
+2. Receives JSON payload: { "message": "...", "priority": "high" }
+```
+
+---
+
+### 24. `GET http://localhost:8001/sensor/alerts` 👷👑
+**Owner:** Person 3 | **Used by:** Staff Monitoring
+
+```
+Response: List[SensorAlert]
+{
+  "sensor_id": "lobby_smoke",
+  "value": 95.5,
+  "threshold": 80.0,
+  "timestamp": "..."
+}
+```
+
+---
+
+### 25. `WS ws://localhost:8002/ws/chat/{session_id}` 🔒
+**Owner:** Person 3 | **Used by:** Guest & Staff
+
+```
+Query Params: ?sender_id=X&sender_role=Y
+Message Schema:
+{
+  "sender_id": "...",
+  "message": "Help needed at Pool",
+  "timestamp": "..."
+}
+```
