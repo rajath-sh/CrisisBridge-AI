@@ -74,27 +74,31 @@ class BaseAgent:
         ]
 
         last_error = None
-        for model in model_fallback_chain:
-            try:
-                logger.info(f"[{self.__class__.__name__}] Trying model: {model}")
-                response = self.client.models.generate_content(
-                    model=model,
-                    contents=prompt,
-                    config=config
-                )
-                return response.text
-            except Exception as e:
-                error_str = str(e)
-                is_transient = any(k in error_str for k in ("503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED"))
-                if is_transient:
-                    logger.warning(f"[{self.__class__.__name__}] Model '{model}' unavailable, trying next fallback...")
-                    last_error = e
-                    time.sleep(1)
-                    continue
-                else:
-                    # Hard error (404 not found, auth, etc.) — fail immediately
-                    logger.error(f"Error in {self.__class__.__name__}: {error_str}")
-                    raise e
+        try:
+            for model in model_fallback_chain:
+                try:
+                    logger.info(f"[{self.__class__.__name__}] Trying model: {model}")
+                    response = self.client.models.generate_content(
+                        model=model,
+                        contents=prompt,
+                        config=config
+                    )
+                    return response.text
+                except Exception as e:
+                    error_str = str(e)
+                    is_transient = any(k in error_str for k in ("503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED"))
+                    if is_transient:
+                        logger.warning(f"[{self.__class__.__name__}] Model '{model}' unavailable, trying next fallback...")
+                        last_error = e
+                        time.sleep(1)
+                        continue
+                    else:
+                        # Hard error (404 not found, auth, etc.) — fail immediately
+                        logger.error(f"Error in {self.__class__.__name__}: {error_str}")
+                        raise e
+            
+            # If we exit the loop without returning, it means all fallbacks failed
+            raise Exception("All models in fallback chain exhausted.")
 
         except Exception as e:
             logger.error(f"[{self.__class__.__name__}] Real AI failed: {str(e)}")
